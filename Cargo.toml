@@ -1,0 +1,13 @@
+[package]
+name = "cstmpl"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tera = "1.20.0"
+clap = { version = "4.5.47", features = ["derive"] }
+chrono = "0.4.41"
+anyhow = "1.0.99"
+inquire = "0.7.5"
+directories = "6.0.0"
+serde_yaml = "0.9.33"
