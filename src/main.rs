@@ -79,6 +79,7 @@ fn main() -> anyhow::Result<()> {
             }
 
             let mut tera = Tera::default();
+            tera.register_function("header", make_header);
             tera.add_raw_template("tpl", &template_body)?;
             let rendered = tera.render("tpl", &context)?;
 
@@ -245,4 +246,37 @@ fn xdg_template_dir() -> anyhow::Result<PathBuf> {
     } else {
         anyhow::bail!("Could not determine XDG data dir")
     }
+}
+
+fn make_header(message: &str) -> String {
+    const WIDTH: usize = 72;
+    let border = "/".to_string() + &"*".repeat(WIDTH - 2) + "/";
+
+    // Wrap text into lines no longer than WIDTH - 4 (for "/* " and " */")
+    let mut lines = Vec::new();
+    let mut current = String::new();
+    for word in message.split_whitespace() {
+        if current.len() + word.len() + 1 > WIDTH - 4 {
+            lines.push(current.trim_end().to_string());
+            current.clear();
+        }
+        current.push_str(word);
+        current.push(' ');
+    }
+    if !current.is_empty() {
+        lines.push(current.trim_end().to_string());
+    }
+
+    // Format into header block
+    let mut result = String::new();
+    result.push_str(&border);
+    result.push('\n');
+    for line in lines {
+        result.push_str("/* ");
+        result.push_str(&format!("{:<width$}", line, width = WIDTH - 6));
+        result.push_str(" */\n");
+    }
+    result.push_str(&border);
+
+    result
 }
